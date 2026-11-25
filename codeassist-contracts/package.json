@@ -1,0 +1,13 @@
+{
+  "name": "codeassist-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "types": "index.d.ts",
+  "scripts": {
+    "generate": "node generate.mjs",
+    "check": "node generate.mjs --check"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.13.0"
+  }
+}

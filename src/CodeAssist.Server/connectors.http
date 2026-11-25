@@ -1,0 +1,38 @@
+@baseUrl = http://127.0.0.1:8080
+@token = {{Host__Listen__Http__Token}}
+@session = 00000000-0000-0000-0000-000000000001
+@server = inventory
+
+### List session-owned connector state
+GET {{baseUrl}}/v1/sessions/{{session}}/connectors
+Authorization: Bearer {{token}}
+
+### Inspect one connection
+GET {{baseUrl}}/v1/sessions/{{session}}/connectors/{{server}}/connection
+Authorization: Bearer {{token}}
+
+### Explicitly start a configured connector
+POST {{baseUrl}}/v1/sessions/{{session}}/connectors/{{server}}/connection
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"confirmed":true}
+
+### Disconnect without forgetting credentials
+DELETE {{baseUrl}}/v1/sessions/{{session}}/connectors/{{server}}/connection
+Authorization: Bearer {{token}}
+
+### Forget locally cached credentials
+DELETE {{baseUrl}}/v1/sessions/{{session}}/connectors/{{server}}/credentials
+Authorization: Bearer {{token}}
+
+### List prompt metadata
+GET {{baseUrl}}/v1/sessions/{{session}}/connectors/{{server}}/prompts
+Authorization: Bearer {{token}}
+
+### Retrieve untrusted prompt messages without inference
+POST {{baseUrl}}/v1/sessions/{{session}}/connectors/{{server}}/prompts/resolve
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"name":"inspect","arguments":{"target":"workspace"}}

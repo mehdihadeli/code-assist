@@ -1,0 +1,190 @@
+{
+  "name": "code-assist-vscode",
+  "displayName": "CodeAssist",
+  "description": "Native VS Code client for the shared CodeAssist .NET agent runtime.",
+  "publisher": "code-assist",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "overrides": {
+    "@vscode/vsce": {
+      "minimatch": "11.0.1"
+    }
+  },
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onChatParticipant:code-assist.agent"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "CodeAssist starts a local runtime and can send explicitly selected source text."
+    },
+    "virtualWorkspaces": {
+      "supported": false
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "npm run build --workspace @codeassist/editor && tsc -p . && esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "test:host": "npm run build && node test/host/run.mjs",
+    "contracts:generate": "npm --prefix ../codeassist-contracts run generate",
+    "contracts:check": "npm --prefix ../codeassist-contracts run check && node ../scripts/export-contracts.mjs --check",
+    "package": "vsce package --no-dependencies --allow-missing-repository --skip-license --out ../artifacts/code-assist-vscode.vsix"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeAssist.connect",
+        "title": "CodeAssist: Connect",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "codeAssist.disconnect",
+        "title": "CodeAssist: Disconnect",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "codeAssist.setServerToken",
+        "title": "CodeAssist: Set External Server Token",
+        "icon": "$(key)"
+      },
+      {
+        "command": "codeAssist.ask",
+        "title": "CodeAssist: Ask",
+        "icon": "$(comment-discussion)"
+      },
+      {
+        "command": "codeAssist.askSelection",
+        "title": "CodeAssist: Ask About Selection",
+        "icon": "$(selection)"
+      },
+      {
+        "command": "codeAssist.skillPrompt",
+        "title": "CodeAssist: Use Skill",
+        "icon": "$(book)"
+      },
+      {
+        "command": "codeAssist.connectors",
+        "title": "CodeAssist: Manage Connectors",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "codeAssist.connectorPrompt",
+        "title": "CodeAssist: Inspect Connector Prompt",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "codeAssist.pluginPrompt",
+        "title": "CodeAssist: Run Plugin Prompt",
+        "icon": "$(extensions)"
+      },
+      {
+        "command": "codeAssist.newSession",
+        "title": "CodeAssist: New Session",
+        "icon": "$(add)"
+      },
+      {
+        "command": "codeAssist.sessions",
+        "title": "CodeAssist: Switch Session",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "codeAssist.showHistory",
+        "title": "CodeAssist: Show Committed History",
+        "icon": "$(history)"
+      },
+      {
+        "command": "codeAssist.selectModel",
+        "title": "CodeAssist: Select Model",
+        "icon": "$(settings)"
+      },
+      {
+        "command": "codeAssist.openChat",
+        "title": "CodeAssist: Open Chat",
+        "icon": "$(comment-discussion)"
+      }
+    ],
+    "chatParticipants": [
+      {
+        "id": "code-assist.agent",
+        "name": "codeassist",
+        "fullName": "CodeAssist",
+        "description": "Chat with your configured CodeAssist model.",
+        "commands": [
+          {
+            "name": "new",
+            "description": "Start a new CodeAssist conversation."
+          }
+        ]
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codeAssist.askSelection",
+          "when": "editorHasSelection && isWorkspaceTrusted",
+          "group": "navigation@20"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CodeAssist",
+      "properties": {
+        "codeAssist.server.mode": {
+          "type": "string",
+          "enum": [
+            "managed",
+            "external"
+          ],
+          "default": "managed",
+          "scope": "machine",
+          "description": "Start an owned server process, or connect to an existing loopback server."
+        },
+        "codeAssist.server.executable": {
+          "type": "string",
+          "default": "CodeAssist.Server",
+          "scope": "machine",
+          "description": "Trusted server executable. Only user settings are read; shell syntax is not evaluated."
+        },
+        "codeAssist.server.arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "machine",
+          "description": "Server arguments, for example a trusted CodeAssist.Server.dll path when executable is dotnet."
+        },
+        "codeAssist.server.endpoint": {
+          "type": "string",
+          "default": "http://127.0.0.1:8080",
+          "scope": "machine",
+          "description": "Existing loopback server URL for external mode. Tokens are stored in SecretStorage, not this setting."
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@codeassist/client": "0.1.0",
+    "@codeassist/editor": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/vscode": "^1.105.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "4.1.0",
+    "typescript": "^7.0.2",
+    "esbuild": "0.28.1"
+  }
+}

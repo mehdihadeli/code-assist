@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../src/CodeAssist.Models/CodeAssist.Models.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Sessions/CodeAssist.Sessions.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Workspaces/CodeAssist.Workspaces.csproj" />
+  </ItemGroup>
+</Project>

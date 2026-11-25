@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../CodeAssist.Tools/CodeAssist.Tools.csproj" />
+    <ProjectReference Include="../CodeAssist.Extensions/CodeAssist.Extensions.csproj" />
+    <ProjectReference Include="../CodeAssist.Models/CodeAssist.Models.csproj" />
+    <ProjectReference Include="../CodeAssist.Persistence/CodeAssist.Persistence.csproj" />
+    <ProjectReference Include="../CodeAssist.Contracts/CodeAssist.Contracts.csproj" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
+    <PackageReference Include="Microsoft.Agents.AI" />
+    <ProjectReference Include="../CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+  </ItemGroup>
+</Project>

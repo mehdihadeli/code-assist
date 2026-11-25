@@ -1,0 +1,293 @@
+name: Build, test, and publish
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: "10.0.x"
+
+jobs:
+  build-test:
+    name: Build and test (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: linux-x64
+            os: ubuntu-latest
+            native_name: libtree-sitter.so
+          - rid: win-x64
+            os: windows-latest
+            native_name: tree-sitter.dll
+          - rid: osx-x64
+            os: macos-15-intel
+            native_name: libtree-sitter.dylib
+          - rid: osx-arm64
+            os: macos-14
+            native_name: libtree-sitter.dylib
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            ${{ env.DOTNET_VERSION }}
+            8.0.x
+
+      - name: Install native build tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --yes cmake ninja-build gcc
+
+      - name: Set up Python for binding verification
+        if: runner.os == 'Windows'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Verify generated native bindings
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --target artifacts/toolchain/python ziglang==0.14.1
+          if ($LASTEXITCODE -ne 0) { throw 'Generation header installation failed.' }
+          ./tools/Generate-Bindings.ps1 -Check
+
+      - name: Configure native runtime
+        run: cmake -S native -B native/build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build native runtime
+        run: cmake --build native/build --config Release
+
+      - name: Stage native runtime package asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "artifacts/native/${{ matrix.rid }}"
+          native_file=$(find native/build \( -type f -o -type l \) -name '${{ matrix.native_name }}' | head -n 1)
+          test -n "$native_file"
+          cp "$native_file" "artifacts/native/${{ matrix.rid }}/${{ matrix.native_name }}"
+
+      - name: Build external grammar libraries
+        shell: pwsh
+        run: |
+          ./tools/Build-GrammarAssets.ps1 -RuntimeIdentifier '${{ matrix.rid }}'
+          "TREE_SITTER_GRAMMAR_DIRECTORY=$PWD/artifacts/grammars/${{ matrix.rid }}" >> $env:GITHUB_ENV
+
+      - name: Configure native library search path
+        shell: bash
+        run: |
+          native_directory="$PWD/artifacts/native/${{ matrix.rid }}"
+          case "$RUNNER_OS" in
+            Windows) cygpath -w "$native_directory" >> "$GITHUB_PATH" ;;
+            macOS) echo "DYLD_LIBRARY_PATH=$native_directory:${DYLD_LIBRARY_PATH:-}" >> "$GITHUB_ENV" ;;
+            *) echo "LD_LIBRARY_PATH=$native_directory:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV" ;;
+          esac
+
+      - name: Restore
+        run: dotnet restore TreeSitter.slnx
+
+      - name: Build managed projects
+        run: dotnet build TreeSitter.slnx --configuration Release --no-restore
+
+      - name: Unit tests
+        run: dotnet test --project tests/Unit/TreeSitter.UnitTests/TreeSitter.UnitTests.csproj --configuration Release --no-build
+
+      - name: Integration tests
+        run: dotnet test --project tests/Integration/TreeSitter.IntegrationTests/TreeSitter.IntegrationTests.csproj --configuration Release --no-build
+        env:
+          TREE_SITTER_REQUIRE_NATIVE_TESTS: "1"
+
+      - name: Run focused feature samples
+        shell: pwsh
+        run: |
+          foreach ($project in Get-ChildItem samples -Recurse -Filter '*.csproj') {
+            dotnet run --project $project.FullName --configuration Release --no-build
+            if ($LASTEXITCODE -ne 0) { throw "Sample failed: $($project.Name)" }
+          }
+
+      - name: Upload distribution inputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: distribution-${{ matrix.rid }}
+          path: |
+            artifacts/native/
+            artifacts/grammars/
+
+  calculate-version:
+    name: Calculate release version
+    needs: build-test
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      assembly_version: ${{ steps.version.outputs.assembly_version }}
+      file_version: ${{ steps.version.outputs.file_version }}
+      informational_version: ${{ steps.version.outputs.informational_version }}
+      environment: ${{ steps.version.outputs.environment }}
+      release_tag: ${{ steps.version.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Restore local tools
+        run: dotnet tool restore
+      - name: Test version decisions
+        run: bash scripts/test-versioning.sh
+      - name: Calculate version
+        id: version
+        run: bash scripts/calculate-version.sh
+
+  package:
+    name: Assemble single consumer package
+    needs: calculate-version
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE_VERSION: ${{ needs['calculate-version'].outputs.version }}
+      ASSEMBLY_VERSION: ${{ needs['calculate-version'].outputs.assembly_version }}
+      FILE_VERSION: ${{ needs['calculate-version'].outputs.file_version }}
+      INFORMATIONAL_VERSION: ${{ needs['calculate-version'].outputs.informational_version }}
+      RELEASE_TAG: ${{ needs['calculate-version'].outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: distribution-*
+          path: artifacts
+          merge-multiple: true
+      - name: Generate trusted catalog and pack
+        shell: pwsh
+        run: |
+          ./tools/New-GrammarCatalog.ps1 -GrammarRoot "$PWD/artifacts/grammars" `
+            -RuntimeIdentifiers linux-x64,win-x64,osx-x64,osx-arm64 `
+            -ReleaseBaseUri "https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG" `
+            -OutputPath "$PWD/artifacts/grammars.json" -ReleaseDirectory "$PWD/artifacts/release"
+          dotnet pack src/TreeSitter/TreeSitter.csproj -c Release --output artifacts/packages `
+            -p:Version=$env:PACKAGE_VERSION -p:PackageVersion=$env:PACKAGE_VERSION `
+            -p:AssemblyVersion=$env:ASSEMBLY_VERSION -p:FileVersion=$env:FILE_VERSION `
+            -p:InformationalVersion=$env:INFORMATIONAL_VERSION -p:IncludeSourceRevisionInInformationalVersion=false `
+            -p:GenerateDocumentationFile=false -p:ContinuousIntegrationBuild=true `
+            -p:RepositoryUrl="https://github.com/$env:GITHUB_REPOSITORY" `
+            -p:GrammarCatalogPath="$PWD/artifacts/grammars.json" -p:NativeAssetRoot="$PWD/artifacts/native"
+          if ($LASTEXITCODE -ne 0) { throw 'NuGet packaging failed.' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: consumer-package
+          path: artifacts/packages/*.nupkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: grammar-release
+          path: artifacts/release/*
+
+  package-smoke:
+    name: Package consumer (${{ matrix.rid }})
+    needs: [package, calculate-version]
+    env:
+      PACKAGE_VERSION: ${{ needs['calculate-version'].outputs.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: linux-x64
+            os: ubuntu-latest
+          - rid: win-x64
+            os: windows-latest
+          - rid: osx-x64
+            os: macos-15-intel
+          - rid: osx-arm64
+            os: macos-14
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            ${{ env.DOTNET_VERSION }}
+            8.0.x
+      - uses: actions/download-artifact@v4
+        with:
+          name: consumer-package
+          path: artifacts/packages
+      - uses: actions/download-artifact@v4
+        with:
+          name: distribution-${{ matrix.rid }}
+          path: artifacts
+      - name: Restore, publish, and execute package-only consumer
+        shell: pwsh
+        run: |
+          foreach ($framework in 'net10.0', 'net8.0') {
+            ./tools/Test-PackageConsumer.ps1 -PackageDirectory "$PWD/artifacts/packages" -PackageVersion $env:PACKAGE_VERSION `
+              -TargetFramework $framework -RuntimeIdentifier '${{ matrix.rid }}' `
+              -GrammarDirectory "$PWD/artifacts/grammars/${{ matrix.rid }}"
+          }
+
+  publish:
+    name: Publish package and grammar assets
+    permissions:
+      contents: write
+    if: startsWith(github.ref, 'refs/tags/v') || (github.ref == 'refs/heads/main' && needs['calculate-version'].outputs.environment == 'dev')
+    needs: [package-smoke, calculate-version]
+    runs-on: ubuntu-latest
+    environment: nuget
+    env:
+      RELEASE_VERSION: ${{ needs['calculate-version'].outputs.version }}
+      RELEASE_TAG: ${{ needs['calculate-version'].outputs.release_tag }}
+      RELEASE_CHANNEL: ${{ needs['calculate-version'].outputs.environment }}
+
+    steps:
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: consumer-package
+          path: artifacts/packages
+
+      - name: Download grammar artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: grammar-release
+          path: artifacts/release
+
+      - name: Publish grammar release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            options=(--repo "$GITHUB_REPOSITORY" --title "v$RELEASE_VERSION" --generate-notes --draft)
+            if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+              options+=(--verify-tag)
+            else
+              options+=(--target "$GITHUB_SHA")
+            fi
+            if [[ "$RELEASE_CHANNEL" != production ]]; then options+=(--prerelease); fi
+            gh release create "$RELEASE_TAG" "${options[@]}"
+          fi
+          gh release upload "$RELEASE_TAG" artifacts/release/* artifacts/packages/*.nupkg --repo "$GITHUB_REPOSITORY"
+          gh release edit "$RELEASE_TAG" --draft=false --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish to NuGet.org
+        run: dotnet nuget push "artifacts/packages/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

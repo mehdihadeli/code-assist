@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../CodeAssist.Contracts/CodeAssist.Contracts.csproj" />
+    <ProjectReference Include="../CodeAssist.Client/CodeAssist.Client.csproj" />
+    <ProjectReference Include="../CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+    <PackageReference Include="Spectre.Console" />
+  </ItemGroup>
+</Project>

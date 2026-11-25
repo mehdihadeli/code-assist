@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../CodeAssist.Tools/CodeAssist.Tools.csproj" />
+    <ProjectReference Include="../CodeAssist.Workspaces/CodeAssist.Workspaces.csproj" />
+    <PackageReference Include="ModelContextProtocol" />
+  </ItemGroup>
+</Project>
