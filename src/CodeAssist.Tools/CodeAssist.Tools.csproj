@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../CodeAssist.Contracts/CodeAssist.Contracts.csproj" />
+    <ProjectReference Include="../CodeAssist.Persistence/CodeAssist.Persistence.csproj" />
+    <ProjectReference Include="../CodeAssist.Workspaces/CodeAssist.Workspaces.csproj" />
+    <PackageReference Include="JsonSchema.Net" />
+    <PackageReference Include="Microsoft.Playwright" />
+    <PackageReference Include="StreamJsonRpc" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+  </ItemGroup>
+</Project>

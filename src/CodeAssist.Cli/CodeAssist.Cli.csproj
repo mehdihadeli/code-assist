@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackAsTool>true</PackAsTool>
+    <IsPackable>true</IsPackable>
+    <ToolCommandName>ca</ToolCommandName>
+    <PackageId>code-assist</PackageId>
+    <Description>An extensible, permission-aware .NET coding agent for your terminal.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeServiceInToolPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../CodeAssist.Tui/CodeAssist.Tui.csproj" />
+    <ProjectReference Include="../CodeAssist.Client/CodeAssist.Client.csproj" />
+    <ProjectReference Include="../CodeAssist.Server/CodeAssist.Server.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    <ProjectReference Include="../CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+    <ProjectReference Include="../CodeAssist.Contracts/CodeAssist.Contracts.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Spectre.Console.Cli" />
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Update="Fonts/NOTICE.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Pack="true" PackagePath="tools/$(TargetFramework)/any/Fonts/" />
+  </ItemGroup>
+  <Target Name="BundleCodeAssistService" BeforeTargets="GetCopyToOutputDirectoryItems">
+    <ItemGroup>
+      <ServiceAsset Include="../CodeAssist.Server/bin/$(Configuration)/$(TargetFramework)/**/*" />
+      <ContentWithTargetPath Include="@(ServiceAsset)">
+        <TargetPath>service/%(ServiceAsset.RecursiveDir)%(ServiceAsset.Filename)%(ServiceAsset.Extension)</TargetPath>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </ContentWithTargetPath>
+    </ItemGroup>
+  </Target>
+  <Target Name="IncludeServiceInToolPackage">
+    <ItemGroup>
+      <ServicePackageAsset Include="../CodeAssist.Server/bin/$(Configuration)/$(TargetFramework)/**/*" />
+      <TfmSpecificPackageFile Include="@(ServicePackageAsset)">
+        <PackagePath>tools/$(TargetFramework)/any/service/%(ServicePackageAsset.RecursiveDir)</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
+</Project>

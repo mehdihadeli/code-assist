@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../CodeAssist.Tools/CodeAssist.Tools.csproj" />
+    <ProjectReference Include="../CodeAssist.Persistence/CodeAssist.Persistence.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="ModelContextProtocol" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+  </ItemGroup>
+</Project>

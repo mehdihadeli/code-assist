@@ -1,127 +1,189 @@
-# AI Assist
+# Code Assist
 
-> `Context Aware` AI coding assistant inside terminal to help in code development, code explanation, code refactor and review, bug fix and chat with supporting local and online language models
+A .NET 10 coding assistant with a command-line interface and a native VS Code extension. Both connect to the same local server for provider access and conversations.
 
-`AIAssist` is compatible with bellow AI Services: 
-- [x] [OpenAI](https://platform.openai.com/docs/api-reference/introduction) through apis
-- [x] [Azure AI Services](https://azure.microsoft.com/en-us/products/ai-services) through apis
-- [x] [Ollama](https://ollama.com/) with using [ollama models](https://ollama.com/search) locally
-- [x] [Anthropic](https://docs.anthropic.com/en/api/getting-started) through apis
-- [x] [OpenRouter](https://openrouter.ai/docs/quick-start) through apis
-- [x] [Grok](https://x.ai/api) through apis
-- [x] [Gemini](https://ai.google.dev) through apis
-- [x] [DeepSeek](https://api-docs.deepseek.com/) through apis
-- [x] [Qwen](https://qwen.ai/apiplatform) through apis
+Use the CLI to configure providers, inspect models and tools, manage connectors, and run streamed text conversations with `run` or line-oriented `chat`. Chat includes native session/inspection commands and namespaced prompt, skill and plugin guidance. Committed conversations recover across service restarts. Use VS Code for native text chat and selection questions. Workspace coding edits, approvals and the full-screen terminal UI remain unavailable. See [feature status](docs/content/guide/features.md).
 
-> [!TIP]
-> You can use ollama and its models that are more compatible with code like [deepseek-v2.5](https://ollama.com/library/deepseek-v2.5) or [qwen2.5-coder](https://ollama.com/library/qwen2.5-coder) locally. To use local models, you will need to run [Ollama](https://github.com/ollama/ollama) process first. For running ollama you can use [ollama docker](https://ollama.com/blog/ollama-is-now-available-as-an-official-docker-image) container.
+## Build and Install
 
-> [!NOTE]
-> Development of `vscode` and `jetbrains` plugins are in the plan and I will add them soon.
+Requires the .NET 10 SDK. Run from the repository root:
 
-## Features
-
--   ✅ `Context Aware` ai code assistant through [ai embeddings](src/AIAssistant/Services/CodeAssistStrategies/EmbeddingCodeAssist.cs) which is based on Retrieval Augmented Generation (RAG) or [tree-sitter application summarization](src/AIAssistant/Services/CodeAssistStrategies/TreeSitterCodeAssistSummary.cs) to summarize application context and understanding by AI.
--   ✅ Support different result formats, like [Unified Diff Format](src/AIAssistant/Diff/UnifiedCodeDiffParser.cs), [Code Block Format](src/AIAssistant/Diff/CodeBlockDiffParser.cs) and [Search-Replace Format](src/AIAssistant/Diff/SearchReplaceParser.cs).
--   ✅ Code assistant for developing new features, finding bugs, refactor and review existing code base.
--   ✅ Chat mode for chatting with different local and online AI models through terminal.
--   ✅ Support local [ollama models](https://ollama.com/library) and [OpenAI](https://platform.openai.com/docs/models) and [Azure AI Service](https://ai.azure.com/explore/models) models.
--   ✅ Support multiple code languages like C#, Java, go,...
--   ✅ Syntax highlighting for showing code blocks and using `md format` for ai results with capability of `changing theme` like dracula theme or vscode light theme.
--   ✅ Defining a dedicated ignore file for AIAssist through a `.aiassistignore` for excluding files and folders that you want to exclude from code assist process and decreasing final token size.
--   ✅ Customize `configuration` through creating `aiassist-config.json` running directory for `aiassist` and a format like [predefined aiassist-config.json](./src/AIAssistant/aiassist-config.json).
--   ✅ Showing token usage count and calculated priced based on each model `input token` and `output token` price.
--   ✅ Customize models information with creating a customized models information through `ModelsInformationOptions` section in the `aiassist-config.json` and a format like [predefined models information](./src/Clients/LLMs/models_information_list.json).
--   ✅ Customize models options through `ModelsOptions` section in the `aiassist-config.json` and a format like [predefined models options](./src/Clients/LLMs/models_options.json).
--   ✅ Terminal main commands like `aiassist code`, `aiassist chat`, `aiassist explain` and support some internal commands like `:clear`, `:add-file`, `:clear-history`, `:token`, ...
-
-## Get Started
-
-AIAssist uses [Azure AI Services](https://azure.microsoft.com/en-us/products/ai-services) or [OpenAI](https://platform.openai.com/docs/api-reference/introduction) apis by default. For using `OpenAI` or `Azure AI` apis we need to have a `ApiKey`.
-
-- To access `dotnet tool`, we need to install [latest .net sdk](https://dotnet.microsoft.com/en-us/download) first.
-- Install `aiassist` with `dotnet tool install` and bellow command:
-
-```bash
-dotnet tool install --global AIAssist 
+```sh
+dotnet build CodeAssist.slnx -c Release
+ENABLED_LIVE_TESTS=0 dotnet test --solution CodeAssist.slnx -c Release --no-progress --ignore-exit-code 8
+dotnet run --project src/CodeAssist.Cli -- --help
+dotnet pack src/CodeAssist.Cli -c Release -o artifacts/packages
 ```
 
-- For OpenAI If you don't have a API key you can [sign up](https://platform.openai.com/signup) in OpenAI and get a ApiKey.
-- For Azure AI service you can [signup](https://azure.microsoft.com/en-us/products/ai-services) a azure account and get a AI model API key.
-- After getting Api key we should set API key for chat and embedding models through environment variable or command options.
-- Now got to `project directory` with `cd` command in terminal, For running `aiassist` and setting api key.
+The CLI project packages as the `code-assist` .NET tool. The package is built locally, not published to NuGet. Examples below use an installed `code-assist`; for development, replace it with `dotnet run --project src/CodeAssist.Cli --`.
 
-```bash
-# Go to project directory
-cd /to/project/directory
-```
+Repo-local development launchers build and run the CLI without installing the tool:
 
--   Set `Api Key` through `environment variable`:
-
-Linux terminal:
-```bash
-export CHAT_MODEL_API_KEY=your-chat-api-key-here
-export EMBEDDINGS_MODEL_API_KEY=your-embedding-api-key-here
-```
-
-Windows Powershell Terminal:
 ```powershell
-$env:CHAT_MODEL_API_KEY=your-chat-api-key-here
-$env:EMBEDDINGS_MODEL_API_KEY=your-embedding-api-key-here
+.\ca.ps1 --help
+.\ca.ps1 chat
 ```
 
--   Or set `Api Key` through `command option`:
+Use `ca.cmd --help` in Windows CMD, or `./ca --help` in Bash on Linux, macOS or Git Bash. Arguments and exit codes pass through unchanged, and the caller's working directory remains the workspace. Launchers use `--no-restore`; run `dotnet restore CodeAssist.slnx` once after cloning or changing dependencies.
 
-```bash
-aiassist code --chat-api-key your-chat-api-key-here  --embeddings-api-key your-embedding-api-key-here
+## Shared Runtime
+
+The CLI and VS Code extension connect to `CodeAssist.Server` over authenticated local HTTP. Provider settings and credentials stay in the .NET runtime. The CLI bundles the server; the extension requires a compatible server installation. See the [server guide](docs/content/guide/server.md) for connection setup and limits.
+
+## Configure
+
+Settings load from defaults, user preferences, user settings, project files, environment, flags and managed policy. Lower-trust project files can tighten restrictions but cannot add providers, credentials, connector processes or allow rules. Every JSON property has an equivalent environment variable using `__` at each nesting level, including dictionary keys and list indices. Environment and flag overrides are never persisted.
+
+User settings live in `~/.code-assist/settings.json` (a sibling `settings.jsonc` takes precedence):
+
+```json
+{
+  "providers": {
+    "default": {
+      "protocol": "openai",
+      "endpoint": "https://api.openai.com/v1/"
+    }
+  },
+  "agent": { "model": "default/gpt-4.1", "maxTurns": 20, "permissionPreset": "ask" }
+}
 ```
 
--   If you are using AI models that need `ApiVersion`, `DeploymentId` and `BaseAddress` like Azure AI Service models, you can set them by environment variable or command options.
--   Set `ApiVersion`, `DeploymentId` and `BaseAddress` through`environment variable`:
+Literal API keys are accepted from the environment, not settings files or flags. Trusted user/managed settings can instead store `"apiKey": "{env:VARIABLE_NAME}"`; the former `envs` list is removed. References resolve only in memory and never bypass managed locks. On PowerShell:
 
-Linux terminal:
-```bash
-export CHAT_BASE_ADDRESS=your-chat-base-address-here
-export CHAT_API_VERSION=your-chat-api-version-here
-export CHAT_DEPLOYMENT_ID=your-chat-deployment-id-here
-export EMBEDDINGS_BASE_ADDRESS=your-embedding-base-address-here
-export EMBEDDINGS_API_VERSION=your-embedding-api-version-here
-export EMBEDDINGS_DEPLOYMENT_ID=your-embedding-deployment-id-here
-```
-
-Windows Powershell Terminal:
 ```powershell
-$env:CHAT_BASE_ADDRESS=your-chat-base-address-here
-$env:CHAT_API_VERSION=your-chat-api-version-here
-$env:CHAT_DEPLOYMENT_ID=your-chat-deployment-id-here
-$env:EMBEDDINGS_BASE_ADDRESS=your-embedding-base-address-here
-$env:EMBEDDINGS_API_VERSION=your-embedding-api-version-here
-$env:EMBEDDINGS_DEPLOYMENT_ID=your-embedding-deployment-id-here
+$env:Providers__default__ApiKey = '<your-provider-key>'
+code-assist doctor
+code-assist config explain agent.maxTurns
 ```
 
--   Or set `ApiVersion`, `DeploymentId` and `BaseAddress` through `command option`:
+SDK-backed provider components support OpenAI chat/Responses and compatible routes, Anthropic, Azure, Google/Gemini, Vertex and Bedrock. New provider entries default to automatic routing and may inherit endpoint/protocol from adapters or catalog data. Native cloud identity setup is supported; vault and OAuth login are not implemented. See [configuration](docs/content/guide/configuration.md).
 
-```bash
-aiassist code --chat-base-address your-chat-base-address-here --chat-api-version your-chat-api-version-here  --chat-deployment-id your-chat-deployment-id-here  --embeddings-base-address your-embeddings-base-address-here  --embeddings-api-version your-embeddings-api-version-here  --embeddings-deployment-id your-embeddings-deployment-id-here
+## Available Commands
+
+```sh
+code-assist config show --sources
+code-assist config validate
+code-assist config schema
+code-assist providers list
+code-assist providers presets --catalog
+code-assist providers models --refresh
+code-assist connectors list
+code-assist tools list
+code-assist doctor
+code-assist run "Explain optimistic concurrency"
+code-assist chat
+code-assist commands list --json
+code-assist commands expand skill/standard/fault-trace --input "Investigate a failed request"
 ```
 
--   Now run the ai assistant with `aiassist` command.
+Catalog refresh fetches models.dev over HTTPS and retains a last-good ETag cache. No bundled model snapshot or sync script is used. Catalog inspection does not send a model inference request. Connector commands manage definitions and explicit server-side runtime operations. Tool commands inspect the catalog, not execute agent turns.
 
-```bash
-# run aiassist in code assistant mode.
-aiassist code
+`run` and `chat` use the configured provider and can incur charges. They launch an owned service that stops on exit; committed conversations recover when the same workspace/storage reopens unless `host.recoverConversations=false`. One service owns each workspace store. For concurrent clients or explicit session reuse, start `serve`, supply the same environment token in the client shell, and use `--endpoint http://127.0.0.1:8080`. Chat `/help` lists commands; one-shot `commands list|expand` never calls a model. See the [CLI reference](docs/content/reference/cli.md).
+
+## Managed Service Shutdown
+
+Ctrl+C cancels the CLI command and starts one shared cleanup task. Repeated or
+concurrent disposal awaits that same task. The owned server receives an explicit
+shutdown signal and gets six seconds to exit gracefully. If necessary, cleanup
+terminates the owned process tree, with bounded five-second containment and
+process-exit waits. Termination failures are traced; failure to confirm shutdown
+is reported instead of waiting indefinitely. Startup failure also cleans up owned
+handles and processes while preserving the original exception cause.
+
+On Windows, an unnamed, non-inheritable kill-on-close job contains the bundled
+server and its ordinary descendants. The server waits for bootstrap acknowledgement
+until job assignment succeeds. Cleanup checks active job membership, including
+children whose original parent has already exited. CLI crash or forced termination
+closes its job handle and terminates associated processes; unrelated processes and
+standalone servers are not assigned to that job. Other platforms retain parent-pipe
+shutdown and process-tree escalation, without the Windows job guarantee.
+
+Verification: 663 CLI integration cases passed. Real terminal Ctrl+C returned 130,
+left no isolated CLI/service process, and the same output rebuilt without DLL
+locks. Tests also cover concurrent cleanup, orphaned descendants, forced owner
+termination, stubborn escalation, bootstrap failures and unrelated-process survival.
+Physical terminal-window closure was not separately tested.
+
+## Terminal Icons
+
+Interactive chat requires a compatible Nerd Font and Unicode before connecting
+the service. Local startup checks installed fonts after workspace consent,
+preferring the saved family and otherwise reusing any compatible installed family.
+This offline check skips the catalog, installation and confirmation questions.
+If no compatible font is found, search the official v3.5.1 release catalog by
+displayed family or ZIP archive name (72 packs). Symbols-only stays visible but
+cannot serve as a terminal text family. Missing fonts download only after explicit approval,
+with the release asset's published SHA-256 verified before bounded ZIP extraction.
+Regular monospaced face, parsed family and glyph support are checked, not assumed
+for every pack. Installation does not select the terminal's font or edit profiles.
+Choose the exact reported family in your terminal settings if glyphs are missing.
+Installed does not prove selected. Chat uses Nerd icons without an ASCII mode.
+
+`chat --icons auto` (default) and `chat --icons nerd` both reuse an installed font
+or require setup when none is available. `--icons ascii` is rejected and old ASCII
+opt-outs are ignored. Selected families are bounded state under the
+CodeAssist home `state` directory, separated by terminal identity, not project
+settings. Removing all compatible fonts requires installation again.
+Escape cancels startup; Ctrl+C exits chat. Declined installation, failed downloads,
+integrity checks and registration stop interactive startup before service connection.
+
+JSON and noninteractive output remain undecorated and do not run font setup.
+Interactive external attachment has the same font requirement. Unicode-disabled
+interactive consoles are rejected. SSH, WSL, containers and headless sessions
+cannot install fonts into the terminal client and must configure the terminal host.
+Windows uses user Fonts/HKCU, macOS uses the user Library/Fonts directory, and
+Linux uses the XDG user font directory with cache refresh when available.
+Downloads allow only official HTTPS assets and bounded official CDN redirects.
+Limits: 768 MiB ZIP, 4096 entries, 16 MiB per face, 4 GiB expanded total, 200:1
+compression ratio, five-minute installation deadline. Traversal, links, malformed
+fonts, absent digests or notices stop startup. Archive and separately pinned glyph
+notices are preserved beside the font. Upstream flags an unlicensed glyph set;
+preserving attribution does not resolve that permission limitation.
+See [terminal font attribution](src/CodeAssist.Cli/Fonts/NOTICE.md).
+
+## Plugins
+
+Create a declarative package with `code-assist plugins init ./review-plugin --id team.review`. Validate and install it, inspect `plugins list --json`, then enable it with `--approve` and its exact digest. Installation is disabled by default; changed releases revoke approval. Use `plugins expand team.review/inspect --input "Review this change"` without inference, or **CodeAssist: Run Plugin Prompt** in VS Code to submit selected guidance through normal text chat.
+
+The shared runtime supports namespaced skills/roles, bounded dispatcher-backed hooks/workflows, declared-only ZIP packages, local/HTTPS registry reads, explicit local publishing and local usage counters. Automatic MCP/LSP service launch, registered workflow tools, live evaluations and publisher analytics remain pending. No plugin code, install scripts or package-manager dependencies are loaded. See the [plugin guide](docs/content/guide/plugins.md) for trust, dependencies, limits and commands.
+
+## Local Agent Server
+
+Configure a provider as above, then in PowerShell 7:
+
+```powershell
+$env:Host__Listen__Http__Token = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+code-assist serve --listen 127.0.0.1:8080
 ```
 
-## ⭐ Support
+The launcher starts the bundled standalone `CodeAssist.Server`. Direct source startup is also supported with `dotnet run --project src/CodeAssist.Server -- --listen 127.0.0.1:8080`; it emits a versioned JSON readiness record.
 
-If you like feel free to ⭐ this repository, It helps out :)
+The server provides bounded durable conversations, metadata/archive controls, conversation-only rewind, per-session reported usage limits, JSON/SSE, cancellation, command/catalog/management APIs and authenticated OpenAPI. The environment-only bearer token grants access to all sessions and admitted management operations in this single-user instance. Remote binding, durable stream replay, automatic shared-service discovery, workspace coding tools and approval execution are not enabled. See the [server guide](docs/content/guide/server.md) for API usage and limits.
 
-Thanks a bunch for supporting me!
+## VS Code Extension
 
-## Contribution
+Build the [VS Code extension](vscode-extension/README.md) from the repository root:
 
-The application is in development status. You are feel free to submit a pull request or create an issue for any bugs or suggestions.
+```sh
+cd vscode-extension
+npm ci
+npm test
+npm run package
+```
 
-## License
+Install the generated VSIX with **Extensions: Install from VSIX**, or press F5 using **CodeAssist VS Code Extension**. With a configured `CodeAssist.Server` executable and a trusted workspace, run **CodeAssist: Connect**, then use `@codeassist` or **CodeAssist: Ask**. **Ask About Selection** sends explicitly selected text only.
 
-The project is under [Apache-2.0 license](./LICENSE).
+Managed mode launches an owned standalone server directly with a private generated token. External mode uses a loopback URL and a token in VS Code SecretStorage. Provider configuration/credentials remain in the .NET runtime; no JavaScript model SDK is used. Remote workspaces require the server on the workspace host. See the [extension guide](docs/content/guide/vscode.md) for source-DLL setup, model/session controls and limits. Automatic runtime installation is not bundled into the private VSIX.
+
+## Safety
+
+- Settings trust, validation, provenance and secret masking are implemented. Runtime policy evaluation, approvals, aggregate budgets and checkpoint-backed session rewind remain pending.
+- File/process/web components have path checks, timeouts and output limits; these are not an OS sandbox or protection against every filesystem race.
+- Processes execute with the current user's privileges. API keys and source data must be protected by the caller and OS permissions.
+- Deterministic tests do not establish live-account compatibility, billing limits or production readiness.
+
+## Development
+
+See [architecture](docs/content/development/architecture.md), [configuration](docs/content/guide/configuration.md), and [feature coverage](docs/content/guide/features.md). Tests use xUnit v3, Microsoft Testing Platform, Shouldly and NSubstitute. Suites follow `tests/CodeAssist.<Project>/UnitTests` and `IntegrationTests`, with source feature folders. Architecture checks remain separate. Normal validation needs no model credentials; live provider tests are opt-in.
+
+Documentation is authored directly in [docs/content](docs/content/index.md); [site development](docs/README.md) covers previewing and publishing it. See [contributing](docs/content/development/contributing.md) for project ownership and validation requirements.

@@ -1,0 +1,9 @@
+{
+  "AgentSessionDto": ["id", "model", "createdAt", "running", "messageCount"],
+  "AgentMessageDto": ["sequence", "role", "text", "createdAt"],
+  "AgentTurnEvent": ["turnId", "sequence", "kind", "text"],
+  "CreateAgentSessionRequest": ["model"],
+  "SendAgentMessageRequest": ["text"],
+  "CancelAgentTurnResponse": ["canceled"],
+  "ServerHealthDto": ["application", "protocol", "status"]
+}

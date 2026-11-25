@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [{
+    "label": "Build CodeAssist Extension",
+    "type": "shell",
+    "command": "npm run build",
+    "options": { "cwd": "${workspaceFolder}/vscode-extension" },
+    "group": "build",
+    "problemMatcher": ["$tsc"]
+  }]
+}

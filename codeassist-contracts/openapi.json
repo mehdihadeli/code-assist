@@ -1,0 +1,2431 @@
+{
+  "components": {
+    "schemas": {
+      "AgentMessageDto": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "sequence": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "sequence",
+          "role",
+          "text",
+          "createdAt"
+        ],
+        "type": "object"
+      },
+      "AgentSessionArchive": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/AgentMessageDto"
+            },
+            "type": "array"
+          },
+          "model": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "version": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "version",
+          "model",
+          "createdAt",
+          "messages",
+          "state"
+        ],
+        "type": "object"
+      },
+      "AgentSessionDetails": {
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "completedTurns": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "failedTurns": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inputTokens": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "outputTokens": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "revision": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "tokensReported": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "title",
+          "archived",
+          "inputTokens",
+          "outputTokens",
+          "completedTurns",
+          "failedTurns",
+          "tokensReported"
+        ],
+        "type": "object"
+      },
+      "AgentSessionDto": {
+        "properties": {
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "messageCount": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "model": {
+            "type": "string"
+          },
+          "running": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "model",
+          "createdAt",
+          "running",
+          "messageCount"
+        ],
+        "type": "object"
+      },
+      "AgentTurnEvent": {
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "sequence": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "text": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "turnId": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "turnId",
+          "sequence",
+          "kind",
+          "text"
+        ],
+        "type": "object"
+      },
+      "CancelAgentTurnResponse": {
+        "properties": {
+          "canceled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "canceled"
+        ],
+        "type": "object"
+      },
+      "CatalogModelDto": {
+        "properties": {
+          "attachment": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "contextWindow": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "input": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "inputTokenLimit": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "maxOutputTokens": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "modelId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "output": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "price": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CatalogPriceDto"
+              }
+            ]
+          },
+          "providerId": {
+            "type": "string"
+          },
+          "reasoning": {
+            "type": "boolean"
+          },
+          "reasoningEfforts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "temperature": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "toolCallSupport": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "toolCalls": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "providerId",
+          "modelId",
+          "name",
+          "contextWindow",
+          "maxOutputTokens",
+          "toolCalls",
+          "reasoning",
+          "input",
+          "output",
+          "price",
+          "status"
+        ],
+        "type": "object"
+      },
+      "CatalogPriceDto": {
+        "properties": {
+          "cacheRead": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "cacheWrite": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "input": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "output": {
+            "format": "double",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ]
+          },
+          "tiers": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogPriceTierDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "input",
+          "output",
+          "cacheRead",
+          "cacheWrite"
+        ],
+        "type": "object"
+      },
+      "CatalogPriceTierDto": {
+        "properties": {
+          "aboveTokens": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "price": {
+            "$ref": "#/components/schemas/CatalogPriceDto"
+          }
+        },
+        "required": [
+          "aboveTokens",
+          "price"
+        ],
+        "type": "object"
+      },
+      "CatalogProviderDto": {
+        "properties": {
+          "api": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "doc": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "env": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "api",
+          "env",
+          "protocol",
+          "doc"
+        ],
+        "type": "object"
+      },
+      "CatalogRefreshDto": {
+        "properties": {
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "modelCount": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "modelCount",
+          "error"
+        ],
+        "type": "object"
+      },
+      "ConversationCommandDto": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "hint": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "kind",
+          "origin"
+        ],
+        "type": "object"
+      },
+      "ConversationCommandExpansion": {
+        "properties": {
+          "model": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "role": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "model",
+          "role"
+        ],
+        "type": "object"
+      },
+      "CreateAgentSessionRequest": {
+        "properties": {
+          "model": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "CreateConnectorConnectionRequest": {
+        "properties": {
+          "confirmed": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "ExpandConversationCommandRequest": {
+        "properties": {
+          "input": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "values": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "object"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "input"
+        ],
+        "type": "object"
+      },
+      "ExpandPluginRequest": {
+        "properties": {
+          "input": {
+            "default": "",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "ExpandSkillRequest": {
+        "properties": {
+          "arguments": {
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "input": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "JsonElement": {},
+      "ManagementCommandRequest": {
+        "properties": {
+          "arguments": {
+            "$ref": "#/components/schemas/JsonElement"
+          },
+          "operation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "operation",
+          "arguments"
+        ],
+        "type": "object"
+      },
+      "ManagementReply": {
+        "properties": {
+          "exitCode": {
+            "default": 0,
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "hasValue": {
+            "default": true,
+            "type": "boolean"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        },
+        "required": [
+          "value",
+          "summary"
+        ],
+        "type": "object"
+      },
+      "McpConnectionStatus": {
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "server": {
+            "type": "string"
+          },
+          "tools": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "server",
+          "connected",
+          "tools"
+        ],
+        "type": "object"
+      },
+      "McpPromptArgument": {
+        "properties": {
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "required"
+        ],
+        "type": "object"
+      },
+      "McpPromptEntry": {
+        "properties": {
+          "arguments": {
+            "items": {
+              "$ref": "#/components/schemas/McpPromptArgument"
+            },
+            "type": "array"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "arguments"
+        ],
+        "type": "object"
+      },
+      "McpPromptMessage": {
+        "properties": {
+          "content": {
+            "$ref": "#/components/schemas/ToolResult"
+          },
+          "role": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "type": "object"
+      },
+      "McpPromptResult": {
+        "properties": {
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/McpPromptMessage"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "description",
+          "messages"
+        ],
+        "type": "object"
+      },
+      "PluginCommandDto": {
+        "properties": {
+          "contentBytes": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "descriptionBytes": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "kind",
+          "description",
+          "descriptionBytes",
+          "contentBytes"
+        ],
+        "type": "object"
+      },
+      "PluginPromptDto": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "ResolveConnectorPromptRequest": {
+        "properties": {
+          "arguments": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "object"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "RewindSessionRequest": {
+        "properties": {
+          "expectedRevision": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "revision": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "revision",
+          "expectedRevision"
+        ],
+        "type": "object"
+      },
+      "SendAgentMessageRequest": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "ServerHealthDto": {
+        "properties": {
+          "application": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "application",
+          "protocol",
+          "status"
+        ],
+        "type": "object"
+      },
+      "SkillCommandDto": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "hint": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "parameters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "origin",
+          "title",
+          "hint",
+          "parameters"
+        ],
+        "type": "object"
+      },
+      "SkillPromptDto": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "ToolAttachment": {
+        "properties": {
+          "data": {
+            "format": "byte",
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mimeType",
+          "data"
+        ],
+        "type": "object"
+      },
+      "ToolInfoDto": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "inputSchema": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "risk": {
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "inputSchema",
+          "risk",
+          "readOnly",
+          "tags"
+        ],
+        "type": "object"
+      },
+      "ToolQueryRequest": {
+        "properties": {
+          "allow": {
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "deny": {
+            "items": {
+              "type": "string"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          }
+        },
+        "required": [
+          "allow",
+          "deny"
+        ],
+        "type": "object"
+      },
+      "ToolResult": {
+        "properties": {
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/ToolAttachment"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "isError": {
+            "default": false,
+            "type": "boolean"
+          },
+          "outputId": {
+            "format": "uuid",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "structuredContent": {},
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "type": "object"
+      },
+      "UpdateSessionRequest": {
+        "properties": {
+          "archived": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "archived"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "bearerFormat": "opaque",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "title": "CodeAssist HTTP API",
+    "version": "v1"
+  },
+  "openapi": "3.1.1",
+  "paths": {
+    "/v1/catalog/models": {
+      "get": {
+        "operationId": "ListModels",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "providerId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogModelDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/catalog/models/{providerId}/{modelId}": {
+      "get": {
+        "operationId": "GetModel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "providerId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "modelId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogModelDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/catalog/providers": {
+      "get": {
+        "operationId": "ListProviders",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CatalogProviderDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/catalog/refresh": {
+      "post": {
+        "operationId": "RefreshCatalog",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogRefreshDto"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
+    "/v1/commands": {
+      "get": {
+        "operationId": "ListConversationCommands",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationCommandDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Commands"
+        ]
+      }
+    },
+    "/v1/commands/expand": {
+      "post": {
+        "operationId": "ExpandConversationCommand",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpandConversationCommandRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationCommandExpansion"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Commands"
+        ]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "Health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerHealthDto"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "CodeAssist.Server"
+        ]
+      }
+    },
+    "/v1/management/{domain}": {
+      "post": {
+        "operationId": "ManageRuntime",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "domain",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManagementCommandRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagementReply"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Management"
+        ]
+      }
+    },
+    "/v1/plugins/commands": {
+      "get": {
+        "operationId": "ListPluginCommands",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PluginCommandDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "List enabled, policy-permitted text contributions.",
+        "tags": [
+          "Plugins"
+        ]
+      }
+    },
+    "/v1/plugins/expand": {
+      "post": {
+        "operationId": "ExpandPluginPrompt",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpandPluginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginPromptDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Expand explicitly selected text without model calls or tool execution.",
+        "tags": [
+          "Plugins"
+        ]
+      }
+    },
+    "/v1/sessions": {
+      "get": {
+        "operationId": "ListSessions",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AgentSessionDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      },
+      "post": {
+        "operationId": "CreateSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAgentSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDto"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/import": {
+      "post": {
+        "operationId": "ImportSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentSessionArchive"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDto"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}": {
+      "delete": {
+        "operationId": "DeleteSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      },
+      "get": {
+        "operationId": "GetSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDto"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/archive": {
+      "get": {
+        "operationId": "ExportSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionArchive"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/cancel": {
+      "post": {
+        "operationId": "CancelTurn",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelAgentTurnResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/checkpoints": {
+      "get": {
+        "operationId": "ListSessionCheckpoints",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "format": "int64",
+                    "pattern": "^-?(?:0|[1-9]\\d*)$",
+                    "type": [
+                      "integer",
+                      "string"
+                    ]
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/connectors": {
+      "get": {
+        "operationId": "ListConnectors",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/McpConnectionStatus"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Inspect configured connectors for one existing conversation without opening connections.",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/connectors/{server}/connection": {
+      "delete": {
+        "operationId": "DeleteConnectorConnection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Close this conversation's connector without removing persisted credentials.",
+        "tags": [
+          "Connectors"
+        ]
+      },
+      "get": {
+        "operationId": "GetConnectorConnection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/McpConnectionStatus"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Inspect one session-owned connector.",
+        "tags": [
+          "Connectors"
+        ]
+      },
+      "post": {
+        "operationId": "CreateConnectorConnection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectorConnectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/McpConnectionStatus"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Explicitly start a trusted configured connector; may launch a child process or OAuth flow.",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/connectors/{server}/credentials": {
+      "delete": {
+        "operationId": "ForgetConnectorCredentials",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Close this session's connector and remove locally owned credentials; does not revoke them at the issuer.",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/connectors/{server}/prompts": {
+      "get": {
+        "operationId": "ListConnectorPrompts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/McpPromptEntry"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "List untrusted prompt metadata from an already connected server.",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/connectors/{server}/prompts/resolve": {
+      "post": {
+        "operationId": "ResolveConnectorPrompt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "server",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveConnectorPromptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/McpPromptResult"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Retrieve untrusted prompt messages without promoting roles, invoking tools or calling a model.",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/details": {
+      "get": {
+        "operationId": "GetSessionDetails",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDetails"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      },
+      "post": {
+        "operationId": "UpdateSessionDetails",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDetails"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/fork": {
+      "post": {
+        "operationId": "ForkSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDto"
+                }
+              }
+            },
+            "description": "Created"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/messages": {
+      "get": {
+        "operationId": "ListMessages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AgentMessageDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      },
+      "post": {
+        "operationId": "SendMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendAgentMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentMessageDto"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/messages/stream": {
+      "post": {
+        "operationId": "StreamMessage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendAgentMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentTurnEvent"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/sessions/{id}/rewind": {
+      "post": {
+        "operationId": "RewindSession",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RewindSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSessionDto"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/v1/skills/commands": {
+      "get": {
+        "operationId": "ListSkillCommands",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SkillCommandDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "List policy-admitted human skill guidance without reading bodies or calling models.",
+        "tags": [
+          "Skills"
+        ]
+      }
+    },
+    "/v1/skills/expand": {
+      "post": {
+        "operationId": "ExpandSkillPrompt",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpandSkillRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillPromptDto"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Expand explicit human guidance without gathering context, starting children or calling models.",
+        "tags": [
+          "Skills"
+        ]
+      }
+    },
+    "/v1/tools/query": {
+      "post": {
+        "operationId": "QueryTools",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToolQueryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ToolInfoDto"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "tags": [
+          "Tools"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "CodeAssist.Server"
+    },
+    {
+      "name": "Catalog"
+    },
+    {
+      "name": "Plugins"
+    },
+    {
+      "name": "Skills"
+    },
+    {
+      "name": "Commands"
+    },
+    {
+      "name": "Tools"
+    },
+    {
+      "name": "Management"
+    },
+    {
+      "name": "Sessions"
+    },
+    {
+      "name": "Connectors"
+    }
+  ]
+}

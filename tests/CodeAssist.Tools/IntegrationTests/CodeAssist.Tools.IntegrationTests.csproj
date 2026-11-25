@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="WireMock.Net" />
+    <ProjectReference Include="../../../src/CodeAssist.Tools/CodeAssist.Tools.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Server/CodeAssist.Server.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Sessions/CodeAssist.Sessions.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Workspaces/CodeAssist.Workspaces.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+  </ItemGroup>
+</Project>

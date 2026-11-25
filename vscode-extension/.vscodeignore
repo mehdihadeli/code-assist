@@ -1,0 +1,10 @@
+src/**
+test/**
+packages/**
+tsconfig.json
+tsconfig.base.json
+package-lock.json
+node_modules/**
+**/*.map
+**/*.ts
+**/*.test.mjs

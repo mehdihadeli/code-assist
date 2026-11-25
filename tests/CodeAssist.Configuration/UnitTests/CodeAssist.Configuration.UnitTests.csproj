@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../src/CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+  </ItemGroup>
+</Project>

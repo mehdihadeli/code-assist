@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../src/CodeAssist.Testing/CodeAssist.Testing.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Cli/CodeAssist.Cli.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+    <PackageReference Include="Spectre.Console.Testing" />
+    <PackageReference Include="WireMock.Net" />
+  </ItemGroup>
+</Project>

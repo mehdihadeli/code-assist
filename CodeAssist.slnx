@@ -1,0 +1,43 @@
+<Solution>
+  <Folder Name="/.git/" />
+  <Folder Name="/.git/testagent/" />
+  <Folder Name="/.git/testagent/managed-lifecycle-2054/" />
+  <Folder Name="/.git/testagent/managed-lifecycle-2054/probe/">
+    <Project Path=".git/testagent/managed-lifecycle-2054/probe/LifecycleProbe.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/CodeAssist.Cli/CodeAssist.Cli.csproj" />
+    <Project Path="src/CodeAssist.Client/CodeAssist.Client.csproj" />
+    <Project Path="src/CodeAssist.Configuration/CodeAssist.Configuration.csproj" />
+    <Project Path="src/CodeAssist.Contracts/CodeAssist.Contracts.csproj" />
+    <Project Path="src/CodeAssist.Extensions/CodeAssist.Extensions.csproj" />
+    <Project Path="src/CodeAssist.Mcp/CodeAssist.Mcp.csproj" />
+    <Project Path="src/CodeAssist.Models/CodeAssist.Models.csproj" />
+    <Project Path="src/CodeAssist.Persistence/CodeAssist.Persistence.csproj" />
+    <Project Path="src/CodeAssist.Security/CodeAssist.Security.csproj" />
+    <Project Path="src/CodeAssist.Server/CodeAssist.Server.csproj" />
+    <Project Path="src/CodeAssist.Sessions/CodeAssist.Sessions.csproj" />
+    <Project Path="src/CodeAssist.Testing/CodeAssist.Testing.csproj" />
+    <Project Path="src/CodeAssist.Tools/CodeAssist.Tools.csproj" />
+    <Project Path="src/CodeAssist.Tui/CodeAssist.Tui.csproj" />
+    <Project Path="src/CodeAssist.Workspaces/CodeAssist.Workspaces.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ArchitectureTests/CodeAssist.ArchitectureTests/CodeAssist.ArchitectureTests.csproj" />
+    <Project Path="tests/CodeAssist.Cli/IntegrationTests/CodeAssist.Cli.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Configuration/IntegrationTests/CodeAssist.Configuration.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Configuration/UnitTests/CodeAssist.Configuration.UnitTests.csproj" />
+    <Project Path="tests/CodeAssist.Contracts/UnitTests/CodeAssist.Contracts.UnitTests.csproj" />
+    <Project Path="tests/CodeAssist.Models/IntegrationTests/CodeAssist.Models.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Models/UnitTests/CodeAssist.Models.UnitTests.csproj" />
+    <Project Path="tests/CodeAssist.Server/Composition/IntegrationTests/CodeAssist.Server.Composition.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Server/IntegrationTests/CodeAssist.Server.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Sessions/UnitTests/CodeAssist.Sessions.UnitTests.csproj" />
+    <Project Path="tests/CodeAssist.Testing/IntegrationTests/CodeAssist.Testing.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Testing/UnitTests/CodeAssist.Testing.UnitTests.csproj" />
+    <Project Path="tests/CodeAssist.Tools/IntegrationTests/CodeAssist.Tools.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Tools/UnitTests/CodeAssist.Tools.UnitTests.csproj" />
+    <Project Path="tests/CodeAssist.Workspaces/IntegrationTests/CodeAssist.Workspaces.IntegrationTests.csproj" />
+    <Project Path="tests/CodeAssist.Workspaces/UnitTests/CodeAssist.Workspaces.UnitTests.csproj" />
+  </Folder>
+</Solution>

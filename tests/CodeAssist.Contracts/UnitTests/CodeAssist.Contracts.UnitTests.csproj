@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../src/CodeAssist.Contracts/CodeAssist.Contracts.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Persistence/CodeAssist.Persistence.csproj" />
+  </ItemGroup>
+</Project>

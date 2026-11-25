@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../../../src/CodeAssist.Tools/CodeAssist.Tools.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Extensions/CodeAssist.Extensions.csproj" />
+    <ProjectReference Include="../../../src/CodeAssist.Mcp/CodeAssist.Mcp.csproj" />
+  </ItemGroup>
+</Project>

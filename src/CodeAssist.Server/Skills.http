@@ -1,0 +1,19 @@
+@baseUrl = http://127.0.0.1:8080
+
+### Human skill metadata; supply authentication through your HTTP client's secret environment.
+GET {{baseUrl}}/v1/skills/commands
+Authorization: Bearer {{token}}
+
+### Expand only. No gathering, inference or delegation.
+POST {{baseUrl}}/v1/skills/expand
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"id":"standard/risk-check","input":"Review the proposed change.","arguments":[]}
+
+### Unknown skill returns 404.
+POST {{baseUrl}}/v1/skills/expand
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"id":"missing-skill"}

@@ -1,0 +1,111 @@
+name: Code Assist
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '*.props'
+      - 'CodeAssist.slnx'
+      - 'global.json'
+      - 'README.md'
+      - 'vscode-extension/**'
+      - 'codeassist-contracts/**'
+      - 'scripts/export-contracts.mjs'
+      - '.github/workflows/code-assist.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '*.props'
+      - 'CodeAssist.slnx'
+      - 'global.json'
+      - 'README.md'
+      - 'vscode-extension/**'
+      - 'codeassist-contracts/**'
+      - 'scripts/export-contracts.mjs'
+      - '.github/workflows/code-assist.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    env:
+      ENABLED_LIVE_TESTS: '0'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore
+        run: dotnet restore CodeAssist.slnx
+      - name: Build
+        run: dotnet build CodeAssist.slnx -c Release --no-restore
+      - name: Test
+        run: dotnet test --solution CodeAssist.slnx -c Release --no-build --no-progress --ignore-exit-code 8
+      - name: Package
+        run: dotnet pack src/CodeAssist.Cli -c Release --no-build -o artifacts/packages
+      - name: Install packaged tool
+        run: dotnet tool install code-assist --tool-path artifacts/tool --version "$(dotnet msbuild src/CodeAssist.Cli/CodeAssist.Cli.csproj -getProperty:PackageVersion -nologo)" --add-source ./artifacts/packages
+      - name: Smoke test
+        run: ./artifacts/tool/code-assist --help
+      - uses: actions/upload-artifact@v4
+        with:
+          name: code-assist-${{ matrix.os }}
+          path: artifacts/packages/*.nupkg
+
+  verify-extension:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: vscode-extension
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            vscode-extension/package-lock.json
+            codeassist-contracts/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: npm ci
+        working-directory: codeassist-contracts
+      - run: npm ci
+      - name: Build standalone runtime
+        run: dotnet build ../src/CodeAssist.Server -c Release
+      - name: Verify generated contracts and published API
+        run: npm --prefix ../codeassist-contracts run check && node ../scripts/export-contracts.mjs --release
+      - name: Extension tests and real server connection
+        env:
+          ENABLED_LIVE_TESTS: '0'
+          CODE_ASSIST_TEST_SERVER: ${{ github.workspace }}/src/CodeAssist.Server/bin/Release/net10.0/CodeAssist.Server.dll
+        run: npm test
+      - name: Isolated VS Code host smoke
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:host
+      - name: Package VSIX
+        if: runner.os == 'Linux'
+        run: npm run package
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: code-assist-vscode
+          path: artifacts/code-assist-vscode.vsix
